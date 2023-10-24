@@ -9,10 +9,12 @@ db = mysql.connector.connect(
     database="av3_func"
 )
 
+
+funcoes.criar_tabela_users(db)
 # Exemplos de uso das funções do módulo funcoes
 # funcoes.adicionar_pessoa(db,"Maria","2002/04/25")
-funcoes.apagar_pessoa(db,"joel","2003/04/02")
-funcoes.visualizar_pessoas(db)
+# funcoes.apagar_pessoa(db,"joel","2003/04/02")
+# funcoes.visualizar_pessoas(db)
 
 # Feche a conexão quando terminar
 db.close()

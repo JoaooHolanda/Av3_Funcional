@@ -40,6 +40,7 @@ def visualizar_pessoas(db):
 
 # Função para alterar a data de nascimento de uma pessoa pelo nome
 def alterar_Senha(db, username,novasenha):
+    
     cursor = db.cursor()
     query = "UPDATE users SET Senha = %s WHERE username = %s"
     values = (novasenha, username)

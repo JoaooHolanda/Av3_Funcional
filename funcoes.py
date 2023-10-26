@@ -2,10 +2,10 @@ import mysql.connector
 
 # Função para verificar se um usuário existe pelo nome
 # Função para verificar se um usuário com um nome e data de nascimento específicos existe
-def verificar_usuario(db, nome_comp, data_nascimento):
+def verificar_usuario(db, cpf):
     cursor = db.cursor()
-    query = "SELECT COUNT(*) FROM users WHERE NomeCompleto = %s AND DataNascimento = %s"
-    cursor.execute(query, (nome_comp, data_nascimento))
+    query = "SELECT COUNT(*) FROM users WHERE CPF = %s "
+    cursor.execute(query, (cpf,))
     count = cursor.fetchone()[0]
     cursor.close()
     
@@ -17,7 +17,7 @@ def verificar_usuario(db, nome_comp, data_nascimento):
 # Função para adicionar uma pessoa
 def adicionar_pessoa(db,Username,Senha,Datanasci,nomecompleto,saldo,cpf):
     #nesse codigo ele verifica se 
-    if( not verificar_usuario(db,nomecompleto,Datanasci)):
+    if( not verificar_usuario(db,cpf)):
         cursor = db.cursor()
         query = "INSERT INTO users (Username,Senha,DataNascimento,NomeCompleto,Saldo,CPF) VALUES (%s,%s,%s,%s,%s,%s)"
         values = (Username,Senha,Datanasci,nomecompleto,saldo,cpf)
@@ -106,7 +106,7 @@ def saque(db,cpf,valor_de_saque):
     cursor.close()
 
 
-def deposito(db,cpf,valor_de_deposito):
+def deposito(db,cpf,valor_de_deposito):  
     valor_de_deposito = float(valor_de_deposito)
     cursor = db.cursor()
     query = "SELECT Saldo FROM users WHERE CPF = %s"
@@ -121,3 +121,12 @@ def deposito(db,cpf,valor_de_deposito):
     cursor.execute(new_query,values)
     db.commit()
     cursor.close()
+
+def corrige_nascimento(db,cpf):
+    cursor = db.cursor()
+    query = "SELECT DataNascimento from users where CPF = %s"
+    value = (cpf,)
+    cursor.execute(query,value)
+    valor = cursor.fetchall()
+    valor = str(valor[0][0])
+    print(valor)

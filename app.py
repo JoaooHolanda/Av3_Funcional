@@ -1,11 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash,session
 import mysql.connector
 import secrets  # Usaremos a biblioteca "secrets" para gerar tokens seguros
 import datetime
+from datetime import datetime
 import funcoes
 
 app = Flask(__name__)
-
+app.secret_key = '#euamoDeus2'
 # Função para conectar ao banco de dados
 def conectar_banco():
     return mysql.connector.connect(
@@ -22,6 +23,8 @@ funcoes.criar_tabela_users(db)
 def login():
     return render_template('login-form-18/index.html')
 
+
+# Autenticar usuário
 @app.route('/autenticar', methods=['POST'])
 def autenticar():
     db = conectar_banco()
@@ -30,18 +33,24 @@ def autenticar():
 
     cursor = db.cursor()
 
-    query = "SELECT Username, Senha, NomeCompleto, DataNascimento FROM users WHERE Username = %s AND Senha = %s"
+    query = "SELECT Username, Senha, NomeCompleto, DataNascimento, CPF FROM users WHERE Username = %s AND Senha = %s"
     cursor.execute(query, (username, senha))
     result = cursor.fetchone()
-    
-    
+
     cursor.close()
     db.close()
+
     if result:
         nome = result[2]
         data_de_nascimento = result[3]
+        cpf = result[4]
 
-        return redirect('/profile?nome={}&data_de_nascimento={}'.format(nome, data_de_nascimento))
+        # Armazene os dados na sessão
+        session['nome'] = nome
+        session['data_de_nascimento'] = data_de_nascimento
+        session['cpf'] = cpf
+
+        return redirect('/profile')
 
     else:
         # Login falhou
@@ -50,31 +59,41 @@ def autenticar():
         <script>
             Toastify({
                 text: "Login falhou. Verifique suas credenciais.",
-                duration: 5000,  // Duração do toast em milissegundos (opcional)
-                gravity: "top",  // Posição do toast (opcional)
-                backgroundColor: "red"  // Cor de fundo do toast (opcional)
+                duration: 5000,
+                gravity: "top",
+                backgroundColor: "red"
             }).showToast();
         </script>
         """
         return render_template('login-form-18/index.html', toast_script=toast_script)
+
     
 
-#mostrando o perfil
+# Página de perfil
 @app.route('/profile')
 def profile():
-    nome = request.args.get('nome')
-    data_de_nascimento = request.args.get('data_de_nascimento')
+    # Recupere os dados da sessão
+    nome = session.get('nome', None)
+    data_de_nascimento = session.get('data_de_nascimento', None)
+    cpf = session.get('cpf', None)
+
+    if data_de_nascimento:
+        # Converta a data de nascimento para o formato desejado
+        data_de_nascimento = datetime.strptime(data_de_nascimento, "%a, %d %b %Y %H:%M:%S %Z").strftime("%d/%m/%Y")
+
     toast_script = """
         <script>
             Toastify({
                 text: "Login feito com sucesso! Bem vindo",
-                duration: 5000,  // Duração do toast em milissegundos (opcional)
-                gravity: "top",  // Posição do toast (opcional)
-                backgroundColor: "green"  // Cor de fundo do toast (opcional)
+                duration: 5000,
+                gravity: "top",
+                backgroundColor: "green"
             }).showToast();
         </script>
-        """
-    return render_template("login-form-18/Profile.html", nome=nome, data_de_nascimento=data_de_nascimento,toast_script=toast_script)
+    """
+
+    saldo = funcoes.saldo(db,cpf)
+    return render_template("login-form-18/Profile.html", nome=nome, data_de_nascimento=data_de_nascimento, saldo=saldo, toast_script=toast_script)
 
 #criando o user
 @app.route('/criaruser')
@@ -86,7 +105,6 @@ def cadastro():
 @app.route("/cadastro",methods=['POST'])
 def cadastrar_user():
     db = conectar_banco()
-    
     if request.method == 'POST':
         username = request.form['username']
         senha = request.form['senha']
@@ -94,20 +112,35 @@ def cadastrar_user():
         dtnasci = request.form['dt_nasci']
         saldo = float(request.form['saldo'])
         cpf = request.form['cpf']
+        
+        if not funcoes.verificar_usuario(db,cpf):
+            
 
-        funcoes.adicionar_pessoa(db,username,senha,dtnasci,NomeCom,saldo,cpf)
-    
-    toast_script = """
-        <script>
-            Toastify({
-                text: "Usuário Criado com Sucesso",
-                duration: 5000,  // Duração do toast em milissegundos (opcional)
-                gravity: "top",  // Posição do toast (opcional)
-                backgroundColor: "green"  // Cor de fundo do toast (opcional)
-            }).showToast();
-        </script>
-        """
-    return render_template('login-form-18/index.html',toast_script=toast_script)
+            funcoes.adicionar_pessoa(db,username,senha,dtnasci,NomeCom,saldo,cpf)
+        
+            toast_script = """
+                <script>
+                    Toastify({
+                        text: "Usuário Criado com Sucesso",
+                        duration: 5000,  // Duração do toast em milissegundos (opcional)
+                        gravity: "top",  // Posição do toast (opcional)
+                        backgroundColor: "green"  // Cor de fundo do toast (opcional)
+                    }).showToast();
+                </script>
+                """
+            return render_template('login-form-18/index.html',toast_script=toast_script)
+        else:
+            toast_script = """
+                <script>
+                    Toastify({
+                        text: "Usuário Ja existente",
+                        duration: 5000,  // Duração do toast em milissegundos (opcional)
+                        gravity: "top",  // Posição do toast (opcional)
+                        backgroundColor: "red"  // Cor de fundo do toast (opcional)
+                    }).showToast();
+                </script>
+                """
+            return render_template('login-form-18/Cadastro.html',toast_script=toast_script)
 
 
 #tela de esqeuci a senha
@@ -146,7 +179,6 @@ def forgot_password():
             return render_template('login-form-18/forgot_password.html', toast_script=toast_script)
 
     return render_template('login-form-18/forgot_password.html')
-
 
 
 #trocando a senha no banco
@@ -192,7 +224,7 @@ def reset_password(username):
             }).showToast();
         </script>
         """
-        return render_template('login-form-18/reset_password.html', toast_script=toast_script)
+        return redirect('profile', toast_script=toast_script)
 
     # Certifique-se de fechar a conexão e o cursor mesmo se não houver um envio POST
     cursor.close()
@@ -201,6 +233,99 @@ def reset_password(username):
     return render_template('login-form-18/reset_password.html')
 
 
+@app.route('/Sacar')
+def sacar():
+    cpf = session.get('cpf', None)
+    if cpf != 0:
+        return render_template("Inside/saque.html")
+
+
+@app.route('/Saque',methods=['POST'])
+def saque():
+    db = conectar_banco()
+    # Recupere os dados da sessão
+    nome = session.get('nome', None)
+    data_de_nascimento = session.get('data_de_nascimento', None)
+    cpf = session.get('cpf', None)
+
+    if data_de_nascimento:
+        # Converta a data de nascimento para o formato desejado
+        data_de_nascimento = datetime.strptime(data_de_nascimento, "%a, %d %b %Y %H:%M:%S %Z").strftime("%d/%m/%Y")
+    if request.method == 'POST':
+        saldo = funcoes.saldo(db,cpf)
+        valor_saque = float(request.form['valor'])
+        if(valor_saque < saldo):
+            funcoes.saque(db,cpf,valor_saque)
+             #valor nao disponivel 
+            nomecom = nome
+            dt_nasc = data_de_nascimento
+            saldo = funcoes.saldo(db,cpf)
+            toast_script = """
+            <script>
+                Toastify({
+                    text: "Saque realizado com sucesso",
+                    duration: 5000,  // Duração do toast em milissegundos (opcional)
+                    gravity: "top",  // Posição do toast (opcional)
+                    backgroundColor: "green"  // Cor de fundo do toast (opcional)
+                }).showToast();
+            </script>
+            """
+            return render_template('login-form-18/Profile.html', toast_script=toast_script,saldo = saldo,data_de_nascimento = dt_nasc,nome=nomecom)
+        else:
+            #valor nao disponivel 
+            # Adicione o script para mostrar um toast
+            toast_script = """
+            <script>
+                Toastify({
+                    text: "Saldo Insuficiente",
+                    duration: 5000,  // Duração do toast em milissegundos (opcional)
+                    gravity: "top",  // Posição do toast (opcional)
+                    backgroundColor: "red"  // Cor de fundo do toast (opcional)
+                }).showToast();
+            </script>
+            """
+            return render_template('Inside/saque.html', toast_script=toast_script)
+
+
+
+
+
+
+@app.route('/Depositar')
+def depositar():
+        return render_template("Inside/deposito.html")
+
+
+@app.route('/Deposito',methods=['POST'])
+def deposito():
+    db = conectar_banco()
+    # Recupere os dados da sessão
+    nome = session.get('nome', None)
+    data_de_nascimento = session.get('data_de_nascimento', None)
+    cpf = session.get('cpf', None)
+
+    if data_de_nascimento:
+        # Converta a data de nascimento para o formato desejado
+        data_de_nascimento = datetime.strptime(data_de_nascimento, "%a, %d %b %Y %H:%M:%S %Z").strftime("%d/%m/%Y")
+    if request.method == 'POST':
+        saldo = funcoes.saldo(db,cpf)
+        valor_saque = float(request.form['valor'])
+        funcoes.deposito(db,cpf,valor_saque)
+         #valor nao disponivel 
+        nomecom = nome
+        dt_nasc = data_de_nascimento
+        saldo = funcoes.saldo(db,cpf)
+        toast_script = """
+        <script>
+            Toastify({
+                text: "Saque realizado com sucesso",
+                duration: 5000,  // Duração do toast em milissegundos (opcional)
+                gravity: "top",  // Posição do toast (opcional)
+                backgroundColor: "green"  // Cor de fundo do toast (opcional)
+            }).showToast();
+        </script>
+        """
+        return render_template('login-form-18/Profile.html', toast_script=toast_script,saldo = saldo,data_de_nascimento = dt_nasc,nome=nomecom)
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -19,28 +19,23 @@
 		<div class="container">
 			<div class="row justify-content-center">
 				<div class="col-md-6 text-center mb-5">
-					<h2 class="heading-section">Qual seu usuário?</h2>
+					<h2 class="heading-section">Saque</h2>
 				</div>
-				
 			</div>
 			<div class="row justify-content-center">
 				<div class="col-md-6 col-lg-5">
 					<div class="login-wrap p-4 p-md-5">
-						<div class="form-group">
-							<a href="/" class="btn btn-primary bi bi-arrow-left rounded  p-3 px-5"></a>
-						</div>
 		      	<div class="icon d-flex align-items-center justify-content-center">
 		      		<span class="fa fa-user-o"></span>
 		      	</div>
-		      	<h3 class="text-center mb-4">Qual seu Username?</h3>
-				
-						<form class="login-form" method="POST">
+		      	<h3 class="text-center mb-4">Quanto você deseja Sacar?</h3>
+						<form class="login-form" action="/Saque" method="POST">
 		      		<div class="form-group">
-		      			<input type="text" name="username"  class="form-control rounded-left" placeholder="username" required>
+		      			<input type="text" name="valor"  class="form-control rounded-left" placeholder="Valor de Saque" required>
 		      		</div>
 	            <div class="justify-content-center d-md-flex">
 	            <div class="form-group">
-	            	<button type="submit" class="btn btn-primary rounded  p-3 px-5" value="Solicitar Redefinição de Senha">Mudar Senha</button>
+	            	<button type="submit" class="btn btn-primary rounded  p-3 px-5" value="Solicitar Redefinição de Senha">Confirmar Saque</button>
 	            </div>
 	          </form>
 	        </div>

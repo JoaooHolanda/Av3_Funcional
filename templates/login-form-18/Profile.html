@@ -19,7 +19,7 @@
 		<div class="container">
 			<div class="row justify-content-center">
 				<div class="col-md-6 text-center mb-5">
-					<h2 class="heading-section">Mudanca de Senha</h2>
+					<h2 class="heading-section">Conta Bancaria</h2>
 				</div>
 			</div>
 			<div class="row justify-content-center">
@@ -29,15 +29,26 @@
 		      		<span class="fa fa-user-o"></span>
 		      	</div>
 		      	<h3 class="text-center mb-4">Bem Vindo A sua conta </h3>
+				  <div class=" justify-content-leff d-md-flex" >
+					<div class="form-group">
+						<a href="/" class="btn btn-primary bi bi-arrow-left rounded  p-3 px-5"></a>
+					</div>
+				</div>
 		      		<div class="form-group">
 		      			<p>Nome : {{ nome }}</p>
 		      		</div>
-	            <div class="form-group d-flex">
+	            <div class="form-group ">
 					<p>Data de Nascimento : {{data_de_nascimento}} </p>
 	            </div>
-	            <div class=" justify-content-center d-md-flex" >
+				<div class="form-group d-flex">
+					<p>Saldo Bancario : {{saldo}} </p>
+	            </div>
+	            <div class=" justify-content-center d-md-flex" style="column-gap: 20px;">
 	            <div class="form-group">
-	            	<a href="/" class="btn btn-primary rounded  p-3 px-5">Voltar para o Login</a>
+	            	<a href="/Sacar" class="btn btn-primary rounded   p-3 px-5">Sacar</a>
+	            </div>
+				<div class="form-group">
+	            	<a href="/Depositar" class="btn btn-primary rounded fixed-right p-3 px-5">Depositar</a>
 	            </div>
 	        </div>
 				</div>

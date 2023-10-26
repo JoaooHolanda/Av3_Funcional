@@ -23,6 +23,9 @@
 			<div class="row justify-content-center">
 				<div class="col-md-6 col-lg-5">
 					<div class="login-wrap p-4 p-md-5">
+						<div class="form-group">
+							<a href="/" class="btn btn-primary bi bi-arrow-left rounded  p-3 px-5"></a>
+						</div>
 		      	<div class="icon d-flex align-items-center justify-content-center">
 		      		<span class="fa fa-user-o"></span>
 		      	</div>
@@ -56,7 +59,7 @@
 			</div>
 		</div>
 	</section>
-
+	{{ toast_script|safe }}
 	<script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/popper.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>

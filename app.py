@@ -40,9 +40,23 @@ def autenticar():
     if result:
         nome = result[2]
         data_de_nascimento = result[3]
+
         return redirect('/profile?nome={}&data_de_nascimento={}'.format(nome, data_de_nascimento))
+
     else:
-        return "Login falhou. Verifique suas credenciais."
+        # Login falhou
+        # Adicione o script para mostrar um toast
+        toast_script = """
+        <script>
+            Toastify({
+                text: "Login falhou. Verifique suas credenciais.",
+                duration: 5000,  // Duração do toast em milissegundos (opcional)
+                gravity: "top",  // Posição do toast (opcional)
+                backgroundColor: "red"  // Cor de fundo do toast (opcional)
+            }).showToast();
+        </script>
+        """
+        return render_template('login-form-18/index.html', toast_script=toast_script)
     
 
 #mostrando o perfil
@@ -50,8 +64,17 @@ def autenticar():
 def profile():
     nome = request.args.get('nome')
     data_de_nascimento = request.args.get('data_de_nascimento')
-
-    return render_template("login-form-18/Profile.html", nome=nome, data_de_nascimento=data_de_nascimento)
+    toast_script = """
+        <script>
+            Toastify({
+                text: "Login feito com sucesso! Bem vindo",
+                duration: 5000,  // Duração do toast em milissegundos (opcional)
+                gravity: "top",  // Posição do toast (opcional)
+                backgroundColor: "green"  // Cor de fundo do toast (opcional)
+            }).showToast();
+        </script>
+        """
+    return render_template("login-form-18/Profile.html", nome=nome, data_de_nascimento=data_de_nascimento,toast_script=toast_script)
 
 #criando o user
 @app.route('/criaruser')
@@ -74,8 +97,17 @@ def cadastrar_user():
 
         funcoes.adicionar_pessoa(db,username,senha,dtnasci,NomeCom,saldo,cpf)
     
-
-    return render_template('login-form-18/index.html')
+    toast_script = """
+        <script>
+            Toastify({
+                text: "Usuário Criado com Sucesso",
+                duration: 5000,  // Duração do toast em milissegundos (opcional)
+                gravity: "top",  // Posição do toast (opcional)
+                backgroundColor: "green"  // Cor de fundo do toast (opcional)
+            }).showToast();
+        </script>
+        """
+    return render_template('login-form-18/index.html',toast_script=toast_script)
 
 
 #tela de esqeuci a senha
@@ -99,8 +131,19 @@ def forgot_password():
             # Se o usuário existe, redirecione para a página de redefinição de senha
             return redirect(url_for('reset_password', username=username))
         else:
-            # Se o usuário não existe, exiba uma mensagem de erro
-            return "Usuário não encontrado."
+            # usuario nao foi encontrado
+            # Adicione o script para mostrar um toast
+            toast_script = """
+            <script>
+                Toastify({
+                    text: "Usario não encontrado!",
+                    duration: 5000,  // Duração do toast em milissegundos (opcional)
+                    gravity: "top",  // Posição do toast (opcional)
+                    backgroundColor: "yellow"  // Cor de fundo do toast (opcional)
+                }).showToast();
+            </script>
+            """
+            return render_template('login-form-18/forgot_password.html', toast_script=toast_script)
 
     return render_template('login-form-18/forgot_password.html')
 
@@ -122,13 +165,34 @@ def reset_password(username):
             cursor.close()  # Feche o cursor
             db.close()  # Feche a conexão
 
-            return render_template('login-form-18/index.html')
+            toast_script = """
+                <script>
+                    Toastify({
+                        text: "Senha alterada com sucesso",
+                        duration: 5000,  // Duração do toast em milissegundos (opcional)
+                        gravity: "top",  // Posição do toast (opcional)
+                        backgroundColor: "green"  // Cor de fundo do toast (opcional)
+                    }).showToast();
+                </script>
+                 """
+            return render_template('login-form-18/index.html',toast_script=toast_script)
             
         else:
             cursor.close()  # Feche o cursor
             db.close()  # Feche a conexão
-
-            return "As senhas não coincidem."
+        #senhas nao coincidem 
+        # Adicione o script para mostrar um toast
+        toast_script = """
+        <script>
+            Toastify({
+                text: "Senhas não coincidem",
+                duration: 5000,  // Duração do toast em milissegundos (opcional)
+                gravity: "top",  // Posição do toast (opcional)
+                backgroundColor: "red"  // Cor de fundo do toast (opcional)
+            }).showToast();
+        </script>
+        """
+        return render_template('login-form-18/reset_password.html', toast_script=toast_script)
 
     # Certifique-se de fechar a conexão e o cursor mesmo se não houver um envio POST
     cursor.close()

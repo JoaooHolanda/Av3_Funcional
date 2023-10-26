@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 import mysql.connector
 import secrets  # Usaremos a biblioteca "secrets" para gerar tokens seguros
 import datetime
@@ -12,7 +12,7 @@ def conectar_banco():
         host="localhost",
         user="root",
         password="#euamoDeus2",
-        database="av3_func"
+        database="Banco_av3"
     )
 db = conectar_banco()
 funcoes.criar_tabela_users(db)
@@ -24,6 +24,7 @@ def login():
 
 @app.route('/autenticar', methods=['POST'])
 def autenticar():
+    db = conectar_banco()
     username = request.form['username']
     senha = request.form['senha']
 
@@ -68,8 +69,10 @@ def cadastrar_user():
         senha = request.form['senha']
         NomeCom = request.form['nome']
         dtnasci = request.form['dt_nasci']
+        saldo = float(request.form['saldo'])
+        cpf = request.form['cpf']
 
-        funcoes.adicionar_pessoa(db,username,senha,dtnasci,NomeCom)
+        funcoes.adicionar_pessoa(db,username,senha,dtnasci,NomeCom,saldo,cpf)
     
 
     return render_template('login-form-18/index.html')
@@ -132,6 +135,8 @@ def reset_password(username):
     db.close()
 
     return render_template('login-form-18/reset_password.html')
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

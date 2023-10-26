@@ -15,12 +15,12 @@ def verificar_usuario(db, nome_comp, data_nascimento):
         return False  # Usuário não encontrado
 
 # Função para adicionar uma pessoa
-def adicionar_pessoa(db,Username,Senha,Datanasci,nomecompleto):
+def adicionar_pessoa(db,Username,Senha,Datanasci,nomecompleto,saldo,cpf):
     #nesse codigo ele verifica se 
     if( not verificar_usuario(db,nomecompleto,Datanasci)):
         cursor = db.cursor()
-        query = "INSERT INTO users (Username,Senha,DataNascimento,NomeCompleto) VALUES (%s,%s,%s,%s)"
-        values = (Username,Senha,Datanasci,nomecompleto)
+        query = "INSERT INTO users (Username,Senha,DataNascimento,NomeCompleto,Saldo,CPF) VALUES (%s,%s,%s,%s,%s,%s)"
+        values = (Username,Senha,Datanasci,nomecompleto,saldo,cpf)
         cursor.execute(query, values)
         db.commit()
         cursor.close()
@@ -68,9 +68,56 @@ def criar_tabela_users(db):
         Username VARCHAR(255) PRIMARY KEY,
         Senha VARCHAR(255),
         NomeCompleto VARCHAR(255),
-        DataNascimento DATE
+        DataNascimento DATE,
+        Saldo FLOAT,
+        CPF VARCHAR(14)
         
     )
     """)
+    db.commit()
+    cursor.close()
+
+def saldo(db,cpf):
+    cursor = db.cursor()
+    query = "SELECT Saldo FROM users WHERE CPF = %s"
+    value = (cpf,)
+    cursor.execute(query, value)
+    valor = cursor.fetchall()
+    saldo = float(valor[0][0])
+    
+    return saldo
+
+
+
+def saque(db,cpf,valor_de_saque):
+    valor_de_saque = float(valor_de_saque)
+    cursor = db.cursor()
+    query = "SELECT Saldo FROM users WHERE CPF = %s"
+    value = (cpf,)
+    cursor.execute(query, value)
+    valor = cursor.fetchall()
+    valor = float(valor[0][0])
+    saldo = valor - valor_de_saque
+    saldo = str(saldo)
+    new_query = "UPDATE users SET Saldo = %s WHERE CPF = %s"
+    values = (saldo,cpf)
+    cursor.execute(new_query,values)
+    db.commit()
+    cursor.close()
+
+
+def deposito(db,cpf,valor_de_deposito):
+    valor_de_deposito = float(valor_de_deposito)
+    cursor = db.cursor()
+    query = "SELECT Saldo FROM users WHERE CPF = %s"
+    value = (cpf,)
+    cursor.execute(query, value)
+    valor = cursor.fetchall()
+    valor = float(valor[0][0])
+    saldo = valor + valor_de_deposito
+    saldo = str(saldo)
+    new_query = "UPDATE users SET Saldo = %s WHERE CPF = %s"
+    values = (saldo,cpf)
+    cursor.execute(new_query,values)
     db.commit()
     cursor.close()

@@ -13,7 +13,7 @@ def conectar_banco():
         host="localhost",
         user="root",
         password="#euamoDeus2",
-        database="Banco_av3"
+        database="sprint2"
     )
 db = conectar_banco()
 funcoes.criar_tabela_users(db)

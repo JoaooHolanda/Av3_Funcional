@@ -20,10 +20,10 @@ apagar_usuario = lambda teste, crs: execsqlcmd(f"DELETE FROM pessoas WHERE nome 
 
 funcoes.criar_tabela_pessoas(db)
 # Exemplos de uso das funções do módulo funcoes
-funcoes.adicionar_pessoa(db,"pedro","2002/04/25")
+#funcoes.adicionar_pessoa(db,"pedro","2002/04/25")
 #apagar_usuario("pedro",crs)
-funcoes.visualizar_pessoas(db)
-#funcoes.alterar_data_nascimento(db,"Joao","2003/04/25")
+#funcoes.visualizar_pessoas(db)
+#funcoes.alterar_data_nascimento(db,"PEDRO","2011/04/25")
 
 # Feche a conexão quando terminar
 

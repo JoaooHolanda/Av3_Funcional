@@ -6,13 +6,26 @@ db = mysql.connector.connect(
     host="localhost",
     user="root",
     password="#euamoDeus2",
-    database="av3_func"
+    database="sprint1"
 )
 
+crs = db.cursor()
+
+execsqlcmd = lambda cmd, crs: crs.execute (cmd)
+
+apagar_usuario = lambda teste, crs: execsqlcmd(f"DELETE FROM pessoas WHERE nome = '{teste}';", crs)
+
+
+
+
+funcoes.criar_tabela_pessoas(db)
 # Exemplos de uso das funções do módulo funcoes
-# funcoes.adicionar_pessoa(db,"Maria","2002/04/25")
-funcoes.apagar_pessoa(db,"joel","2003/04/02")
+funcoes.adicionar_pessoa(db,"pedro","2002/04/25")
+#apagar_usuario("pedro",crs)
 funcoes.visualizar_pessoas(db)
+#funcoes.alterar_data_nascimento(db,"Joao","2003/04/25")
 
 # Feche a conexão quando terminar
-db.close()
+
+db.commit()
+crs.close()

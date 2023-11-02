@@ -2,7 +2,7 @@ import mysql.connector
 
 # Função para verificar se um usuário existe pelo nome
 # Função para verificar se um usuário com um nome e data de nascimento específicos existe
-def verificar_usuario(db, cpf):
+def verificar_cpf(db, cpf):
     cursor = db.cursor()
     query = "SELECT COUNT(*) FROM users WHERE CPF = %s "
     cursor.execute(query, (cpf,))
@@ -14,10 +14,22 @@ def verificar_usuario(db, cpf):
     else:
         return False  # Usuário não encontrado
 
+def verificar_user(db, user):
+    cursor = db.cursor()
+    query = "SELECT COUNT(*) FROM users WHERE Username = %s "
+    cursor.execute(query, (user,))
+    count = cursor.fetchone()[0]
+    cursor.close()
+    
+    if count > 0:
+        return True  # Usuário encontrado
+    else:
+        return False  # Usuário não encontrado
+
 # Função para adicionar uma pessoa
 def adicionar_pessoa(db,Username,Senha,Datanasci,nomecompleto,saldo,cpf):
     #nesse codigo ele verifica se 
-    if( not verificar_usuario(db,cpf)):
+    if( not verificar_cpf(db,cpf) and not verificar_user(db,Username)):
         cursor = db.cursor()
         query = "INSERT INTO users (Username,Senha,DataNascimento,NomeCompleto,Saldo,CPF) VALUES (%s,%s,%s,%s,%s,%s)"
         values = (Username,Senha,Datanasci,nomecompleto,saldo,cpf)

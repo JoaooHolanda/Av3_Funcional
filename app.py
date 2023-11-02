@@ -113,7 +113,7 @@ def cadastrar_user():
         saldo = float(request.form['saldo'])
         cpf = request.form['cpf']
         
-        if not funcoes.verificar_usuario(db,cpf):
+        if not funcoes.verificar_cpf(db,cpf) and not funcoes.verificar_user(db,username):
             
 
             funcoes.adicionar_pessoa(db,username,senha,dtnasci,NomeCom,saldo,cpf)

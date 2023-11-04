@@ -15,7 +15,7 @@ def conectar_banco():
         host="localhost",
         user="root",
         password="#euamoDeus2",
-        database="sprint2"
+        database="sprint3"
     )
 db = conectar_banco()
 

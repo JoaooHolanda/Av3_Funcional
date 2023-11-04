@@ -14,6 +14,13 @@ def verificar_cpf(db, cpf):
     else:
         return False  # Usuário não encontrado
 
+# Função para criar um novo hash de senha para o usuário ao se cadastrar ou alterar a senha
+def hash_password(password):
+    salt = bcrypt.gensalt()
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
+    return salt, hashed_password
+
+
 def verificar_user(db, user):
     cursor = db.cursor()
     query = "SELECT COUNT(*) FROM users WHERE Username = %s "
@@ -25,20 +32,24 @@ def verificar_user(db, user):
         return True  # Usuário encontrado
     else:
         return False  # Usuário não encontrado
+import bcrypt
 
 # Função para adicionar uma pessoa
-def adicionar_pessoa(db,Username,Senha,Datanasci,nomecompleto,saldo,cpf):
-    #nesse codigo ele verifica se 
-    if( not verificar_cpf(db,cpf) and not verificar_user(db,Username)):
+def adicionar_pessoa(db, Username, Senha, Datanasci, nomecompleto, saldo, cpf):
+    # Verifique se o CPF e o nome de usuário já existem
+    if not verificar_cpf(db, cpf) and not verificar_user(db, Username):
         cursor = db.cursor()
-        query = "INSERT INTO users (Username,Senha,DataNascimento,NomeCompleto,Saldo,CPF) VALUES (%s,%s,%s,%s,%s,%s)"
-        values = (Username,Senha,Datanasci,nomecompleto,saldo,cpf)
+        
+        # Crie um hash de senha e obtenha o "salt" e o hash
+        salt, hashed_password = hash_password(Senha)
+        
+        query = "INSERT INTO users (Username, Salt, Senha, DataNascimento, NomeCompleto, Saldo, CPF) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        values = (Username, salt, hashed_password, Datanasci, nomecompleto, saldo, cpf)
         cursor.execute(query, values)
         db.commit()
         cursor.close()
     else:
         print("Usuário já existe")
-
 # Função para visualizar todas as pessoas
 def visualizar_pessoas(db):
     cursor = db.cursor()
@@ -50,7 +61,7 @@ def visualizar_pessoas(db):
 
 
 
-# Função para alterar a data de nascimento de uma pessoa pelo nome
+# Função para alterar a senha de uma pessoa pelo nome
 def alterar_Senha(db, username,novasenha):
     
     cursor = db.cursor()
@@ -78,6 +89,7 @@ def criar_tabela_users(db):
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
         Username VARCHAR(255) PRIMARY KEY,
+        salt VARCHAR(255),
         Senha VARCHAR(255),
         NomeCompleto VARCHAR(255),
         DataNascimento DATE,

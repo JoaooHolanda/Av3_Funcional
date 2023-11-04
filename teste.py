@@ -1,15 +1,14 @@
-import mysql.connector
-import funcoes
-# Função para conectar ao banco de dados
-def conectar_banco():
-    return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="#euamoDeus2",
-        database="Banco_av3"
-    )
-db = conectar_banco()
+import bcrypt
 
-funcoes.corrige_nascimento(db,"1234")
+# Gere uma senha aleatória
+password = "minha_senha_insegura".encode('utf-8')
 
-
+# Crie um hash para a senha
+hashed_password = bcrypt.hashpw(password, bcrypt.gensalt())
+print(hashed_password)
+# Verifique a senha em algum momento posterior
+input_password = "minha_senha_insegura".encode('utf-8')
+if bcrypt.checkpw(input_password, hashed_password):
+    print("Senha correta!")
+else:
+    print("Senha incorreta.")

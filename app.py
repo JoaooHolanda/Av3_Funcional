@@ -1,9 +1,11 @@
+import bcrypt
 from flask import Flask, render_template, request, redirect, url_for, flash,session
 import mysql.connector
 import secrets  # Usaremos a biblioteca "secrets" para gerar tokens seguros
 import datetime
 from datetime import datetime
 import funcoes
+import hashlib
 
 app = Flask(__name__)
 app.secret_key = '#euamoDeus2'
@@ -16,6 +18,7 @@ def conectar_banco():
         database="sprint2"
     )
 db = conectar_banco()
+
 funcoes.criar_tabela_users(db)
 
 
@@ -24,7 +27,17 @@ def login():
     return render_template('login-form-18/index.html')
 
 
-# Autenticar usuário
+# Função para criar um novo hash de senha para o usuário ao se cadastrar ou alterar a senha
+def hash_password(password):
+    salt = bcrypt.gensalt()
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
+    return salt, hashed_password
+
+# Função para verificar a senha durante o login
+def check_password(input_password, salt, hashed_password):
+    new_hashed_password = bcrypt.hashpw(input_password.encode('utf-8'), salt)
+    return new_hashed_password == hashed_password
+
 @app.route('/autenticar', methods=['POST'])
 def autenticar():
     db = conectar_banco()
@@ -33,39 +46,42 @@ def autenticar():
 
     cursor = db.cursor()
 
-    query = "SELECT Username, Senha, NomeCompleto, DataNascimento, CPF FROM users WHERE Username = %s AND Senha = %s"
-    cursor.execute(query, (username, senha))
+    query = "SELECT Username, Senha, NomeCompleto, DataNascimento, CPF, Salt FROM users WHERE Username = %s"
+    cursor.execute(query, (username,))
     result = cursor.fetchone()
-
-    cursor.close()
-    db.close()
-
+    
     if result:
-        nome = result[2]
-        data_de_nascimento = result[3]
-        cpf = result[4]
+        stored_password = result[1].encode('utf-8')  # Senha armazenada no banco, convertida para bytes
+        salt = result[5].encode('utf-8')  # O "salt" armazenado no banco, convertido para bytes
 
-        # Armazene os dados na sessão
-        session['nome'] = nome
-        session['data_de_nascimento'] = data_de_nascimento
-        session['cpf'] = cpf
+        if check_password(senha, salt, stored_password):  # Não converta a senha de entrada para bytes
+            nome = result[2]
+            data_de_nascimento = result[3]
+            cpf = result[4]
 
-        return redirect('/profile')
+            # Armazene os dados na sessão
+            session['nome'] = nome
+            session['data_de_nascimento'] = data_de_nascimento
+            session['cpf'] = cpf
 
-    else:
-        # Login falhou
-        # Adicione o script para mostrar um toast
-        toast_script = """
-        <script>
-            Toastify({
-                text: "Login falhou. Verifique suas credenciais.",
-                duration: 5000,
-                gravity: "top",
-                backgroundColor: "red"
-            }).showToast();
-        </script>
-        """
-        return render_template('login-form-18/index.html', toast_script=toast_script)
+            cursor.close()
+            db.close()
+
+            return redirect('/profile')
+    # Login falhou
+    # Adicione o script para mostrar um toast
+    toast_script = """
+    <script>
+        Toastify({
+            text: "Login falhou. Verifique suas credenciais.",
+            duration: 5000,
+            gravity: "top",
+            backgroundColor: "red"
+        }).showToast();
+    </script>
+    """
+    return render_template('login-form-18/index.html', toast_script=toast_script)
+
 
     
 

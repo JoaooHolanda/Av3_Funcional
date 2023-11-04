@@ -17,7 +17,7 @@ apagar_usuario = lambda teste, crs: execsqlcmd(f"DELETE FROM users WHERE Usernam
 
 
 
-apagar_usuario("pedro",crs)
+apagar_usuario("admin",crs)
 
 
 # Feche a conexão quando terminar

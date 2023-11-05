@@ -20,6 +20,7 @@ def conectar_banco():
 db = conectar_banco()
 
 funcoes.criar_tabela_users(db)
+funcoes.criar_tabela_acess(db)
 
 
 @app.route('/')
@@ -55,9 +56,11 @@ def autenticar():
         salt = result[5].encode('utf-8')  # O "salt" armazenado no banco, convertido para bytes
 
         if check_password(senha, salt, stored_password):  # Não converta a senha de entrada para bytes
+            username = result[0]
             nome = result[2]
             data_de_nascimento = result[3]
             cpf = result[4]
+            funcoes.ultimo_acess(db,username)
 
             # Armazene os dados na sessão
             session['nome'] = nome

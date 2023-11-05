@@ -6,7 +6,7 @@ db = mysql.connector.connect(
     host="localhost",
     user="root",
     password="#euamoDeus2",
-    database="sprint2"
+    database="sprint3"
 )
 
 crs = db.cursor()

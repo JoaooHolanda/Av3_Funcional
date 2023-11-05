@@ -1,5 +1,5 @@
 import mysql.connector
-
+import datetime
 # Função para verificar se um usuário existe pelo nome
 # Função para verificar se um usuário com um nome e data de nascimento específicos existe
 def verificar_cpf(db, cpf):
@@ -46,6 +46,12 @@ def adicionar_pessoa(db, Username, Senha, Datanasci, nomecompleto, saldo, cpf):
         query = "INSERT INTO users (Username, Salt, Senha, DataNascimento, NomeCompleto, Saldo, CPF) VALUES (%s, %s, %s, %s, %s, %s, %s)"
         values = (Username, salt, hashed_password, Datanasci, nomecompleto, saldo, cpf)
         cursor.execute(query, values)
+
+
+        query1 = "INSERT INTO acess(Username) VALUES (%s)"
+        values1 = (Username,)
+        cursor.execute(query1,values1)
+        
         db.commit()
         cursor.close()
     else:
@@ -100,6 +106,27 @@ def criar_tabela_users(db):
     """)
     db.commit()
     cursor.close()
+
+def criar_tabela_acess(db):
+    cursor = db.cursor()
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS acess (
+        Username VARCHAR(255) PRIMARY KEY,
+        Ultimo_Acesso DATETIME
+    )
+    """)
+    db.commit()
+    cursor.close()
+
+
+
+def ultimo_acess(db, username):
+    cursor = db.cursor()
+    query = "UPDATE acess SET Ultimo_Acesso = NOW() WHERE Username = %s"
+    
+    values = (username,)
+    cursor.execute(query, values)
+    db.commit()
 
 def saldo(db,cpf):
     cursor = db.cursor()

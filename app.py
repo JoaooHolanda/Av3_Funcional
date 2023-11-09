@@ -72,6 +72,7 @@ def autenticar():
 # Página de perfil
 @app.route('/profile')
 def profile():
+    db = conectar_banco()
     # Recupere os dados da sessão
     nome = session.get('nome', None)
     data_de_nascimento = session.get('data_de_nascimento', None)
@@ -224,7 +225,7 @@ def reset_password(username):
             }).showToast();
         </script>
         """
-        return redirect('profile', toast_script=toast_script)
+        return render_template('login-form-18/reset_password.html',toast_script=toast_script)
 
     # Certifique-se de fechar a conexão e o cursor mesmo se não houver um envio POST
     cursor.close()
@@ -254,7 +255,7 @@ def saque():
     if request.method == 'POST':
         saldo = funcoes.saldo(db,cpf)
         valor_saque = float(request.form['valor'])
-        if(valor_saque < saldo):
+        if(valor_saque <= saldo):
             funcoes.saque(db,cpf,valor_saque)
              #valor nao disponivel 
             nomecom = nome

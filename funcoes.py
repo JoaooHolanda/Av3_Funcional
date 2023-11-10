@@ -1,5 +1,8 @@
 import mysql.connector
 import datetime
+
+
+
 # Função para verificar se um usuário existe pelo nome
 # Função para verificar se um usuário com um nome e data de nascimento específicos existe
 def verificar_cpf(db, cpf):
@@ -71,9 +74,17 @@ def visualizar_pessoas(db):
 def alterar_Senha(db, username,novasenha):
     
     cursor = db.cursor()
+    
+    # Crie um hash de senha e obtenha o "salt" e o hash
+    salt, hashed_password = hash_password(novasenha)
+
     query = "UPDATE users SET Senha = %s WHERE username = %s"
-    values = (novasenha, username)
+    values = (hashed_password, username)
     cursor.execute(query, values)
+
+    query1 = "UPDATE users SET salt = %s WHERE username = %s"
+    value1 = (salt,username)
+    cursor.execute(query1,value1)
     db.commit()
     cursor.close()
 

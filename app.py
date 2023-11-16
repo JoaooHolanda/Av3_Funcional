@@ -6,6 +6,7 @@ import datetime
 from datetime import datetime
 import funcoes
 import hashlib
+import senha_re as alt
 
 app = Flask(__name__)
 app.secret_key = '#euamoDeus2'
@@ -44,8 +45,15 @@ def autenticar():
     db = conectar_banco()
     username = request.form['username']
     senha = request.form['senha']
-
+    senhas = [senha]
     cursor = db.cursor()
+
+    # Filtra apenas as senhas consideradas "baixas"
+    senhas_baixas = list(filter(lambda senha: alt.verificar_complexidade_senha(senha, "baixa") is not None, senhas))
+
+    # Exemplo de uso
+    print("Senhas consideradas 'baixas':", senhas_baixas)
+
 
     query = "SELECT Username, Senha, NomeCompleto, DataNascimento, CPF, Salt FROM users WHERE Username = %s"
     cursor.execute(query, (username,))

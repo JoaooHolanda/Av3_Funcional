@@ -13,10 +13,10 @@ crs = db.cursor()
 
 execsqlcmd = lambda cmd, crs: crs.execute (cmd)
 
-apagar_usuario = lambda teste, crs: execsqlcmd(f"DELETE FROM users WHERE Username = '{teste}';", crs)
+apagar_usuario = lambda teste, crs,func: func(f"DELETE FROM users WHERE Username = '{teste}';", crs)
 
 
-apagar_usuario("admin",crs)
+apagar_usuario("admin",crs,execsqlcmd)
 
 
 # Feche a conexão quando terminar

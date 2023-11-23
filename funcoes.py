@@ -25,6 +25,14 @@ def hash_password(password):
 
 
 def verificar_user(db, user):
+    
+    # Monad, tratando o valor de user
+    maybe_bind = lambda user, f: print("None") if user is None else f(user)
+    maybe = lambda user: lambda f: maybe_bind(user, f)
+    
+    # Uso da monad para imprimir o valor de user
+    maybe(user)(print)
+    
     cursor = db.cursor()
     query = "SELECT COUNT(*) FROM users WHERE Username = %s "
     cursor.execute(query, (user,))
@@ -147,6 +155,10 @@ def saldo(db,cpf):
     valor = cursor.fetchall()
     saldo = float(valor[0][0])
     
+
+    currying = lambda valor: lambda cpf : print(f"O Cpf {cpf} possui R${valor}")
+    result = currying(saldo)(cpf)
+    print(result)
     return saldo
 
 
@@ -192,3 +204,6 @@ def corrige_nascimento(db,cpf):
     valor = cursor.fetchall()
     valor = str(valor[0][0])
     print(valor)
+
+
+

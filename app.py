@@ -16,7 +16,7 @@ def conectar_banco():
         host="localhost",
         user="root",
         password="#euamoDeus2",
-        database="sprint3"
+        database="av3"
     )
 db = conectar_banco()
 
@@ -345,7 +345,7 @@ def deposito():
         toast_script = """
         <script>
             Toastify({
-                text: "Saque realizado com sucesso",
+                text: "Deposito realizado com sucesso",
                 duration: 5000,  // Duração do toast em milissegundos (opcional)
                 gravity: "top",  // Posição do toast (opcional)
                 backgroundColor: "green"  // Cor de fundo do toast (opcional)

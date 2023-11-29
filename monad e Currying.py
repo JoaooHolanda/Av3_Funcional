@@ -6,10 +6,10 @@ db = mysql.connector.connect(
     host="localhost",
     user="root",
     password="#euamoDeus2",
-    database="sprint3"
+    database="av3"
 )
 
 
 
-funcoes.verificar_user(db,None)
-funcoes.saldo(db,"600000000")
+funcoes.verificar_user(db,"joao")
+funcoes.saldo(db,"102000")
